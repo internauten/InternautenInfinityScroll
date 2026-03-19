@@ -36,6 +36,48 @@ Open the module configuration page in back office and set:
 
 Custom selectors are prioritized. Profile selectors are still used as fallback.
 
+## Release and Tags
+
+This repository includes:
+
+- A GitHub Action that creates releases from valid version tags
+- A helper script to create tags from the module version automatically
+
+### Allowed release tags
+
+- `v1.2.3`
+- `v1.2.3-rc.1`
+
+Workflow file: `.github/workflows/tag-release.yml`
+
+### Tag helper script
+
+Script file: `scripts/create-tags-from-module-version.sh`
+
+The script reads `$this->version` from `internauteninfinityscroll/internauteninfinityscroll.php` and creates an annotated tag like `v0.0.1`.
+
+Examples:
+
+```bash
+# Validate without creating tags
+./scripts/create-tags-from-module-version.sh --dry-run
+
+# Create local tag v<version>
+./scripts/create-tags-from-module-version.sh
+
+# Create and push tag to origin
+./scripts/create-tags-from-module-version.sh --push
+
+# Also create plain tag <version> in addition to v<version>
+./scripts/create-tags-from-module-version.sh --also-plain-tag --push
+```
+
+### Safety checks in script
+
+- Fails if module version is missing or not valid semver (`1.2.3` or `1.2.3-rc.1`)
+- Fails if target tag already exists
+- Fails on non-dry-run if repository has uncommitted changes
+
 ## License
 
 This project is licensed under the MIT License. See details [`LICENSE`](LICENSE).

@@ -19,8 +19,8 @@ class Internauteninfinityscroll extends Module
     {
         $this->name = 'internauteninfinityscroll';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.0';
-        $this->author = 'Internauten';
+        $this->version = '0.0.1';
+        $this->author = 'die.internauten.ch';
         $this->need_instance = 0;
         $this->bootstrap = false;
 

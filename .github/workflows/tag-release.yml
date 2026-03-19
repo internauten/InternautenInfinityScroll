@@ -1,0 +1,107 @@
+name: Release On Version Tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag format
+        id: validate_tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${GITHUB_REF_NAME}"
+          SEMVER_REGEX='^v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$'
+
+          if [[ "${TAG_NAME}" =~ ${SEMVER_REGEX} ]]; then
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag ${TAG_NAME} is not a valid release tag. Expected: vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-rc.N"
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare metadata
+        id: meta
+        if: steps.validate_tag.outputs.valid == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${GITHUB_REF_NAME}"
+          MODULE_DIR="internauteninfinityscroll"
+          ZIP_NAME="${MODULE_DIR}-${TAG_NAME}.zip"
+
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "module_dir=${MODULE_DIR}" >> "$GITHUB_OUTPUT"
+          echo "zip_name=${ZIP_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Create release notes from commit comments
+        if: steps.validate_tag.outputs.valid == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${{ steps.meta.outputs.tag_name }}"
+          PREVIOUS_TAG="$(git for-each-ref --sort=-creatordate --format='%(refname:strip=2)' refs/tags | grep -Fvx "${TAG_NAME}" | head -n 1 || true)"
+
+          {
+            echo "# ${TAG_NAME}"
+            echo
+            echo "## Commit comments"
+            echo
+
+            if [[ -n "${PREVIOUS_TAG}" ]]; then
+              echo "Changes since ${PREVIOUS_TAG}:"
+              echo
+              git log --no-merges --pretty=format:'- %h %s' "${PREVIOUS_TAG}..${TAG_NAME}"
+            else
+              echo "First release tag in this repository:"
+              echo
+              git log --no-merges --pretty=format:'- %h %s' "${TAG_NAME}"
+            fi
+
+            echo
+          } > RELEASE_NOTES.md
+
+      - name: Build module ZIP
+        if: steps.validate_tag.outputs.valid == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODULE_DIR="${{ steps.meta.outputs.module_dir }}"
+          ZIP_NAME="${{ steps.meta.outputs.zip_name }}"
+
+          test -d "${MODULE_DIR}"
+          zip -r "${ZIP_NAME}" "${MODULE_DIR}"
+
+      - name: Create GitHub Release
+        if: steps.validate_tag.outputs.valid == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag_name }}
+          name: ${{ steps.meta.outputs.tag_name }}
+          body_path: RELEASE_NOTES.md
+          files: ${{ steps.meta.outputs.zip_name }}
+          draft: false
+          prerelease: false
+
+      - name: Skip non-release tag
+        if: steps.validate_tag.outputs.valid != 'true'
+        shell: bash
+        run: |
+          echo "No release created for tag ${GITHUB_REF_NAME}."
