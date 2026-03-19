@@ -4,7 +4,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/internauten/InternautenInfinityScroll?display_name=tag)](https://github.com/internauten/InternautenInfinityScroll/releases)
 [![Release Date](https://img.shields.io/github/release-date/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/releases)
 [![Tag](https://img.shields.io/github/v/tag/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/tags)
-[![License](https://img.shields.io/github/license/internauten/InternautenInfinityScroll)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [![Last Commit](https://img.shields.io/github/last-commit/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/commits/main)
 [![Commit Activity](https://img.shields.io/github/commit-activity/m/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/graphs/commit-activity)
@@ -12,8 +12,8 @@
 [![Open Issues](https://img.shields.io/github/issues/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/issues)
 [![Open PRs](https://img.shields.io/github/issues-pr/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/pulls)
 
-[![Stars](https://img.shields.io/github/stars/internauten/InternautenInfinityScroll?style=social)](https://github.com/internauten/InternautenInfinityScroll/stargazers)
-[![Forks](https://img.shields.io/github/forks/internauten/InternautenInfinityScroll?style=social)](https://github.com/internauten/InternautenInfinityScroll/network/members)
+[![Stars](https://img.shields.io/badge/stars-see%20GitHub-blue)](https://github.com/internauten/InternautenInfinityScroll/stargazers)
+[![Forks](https://img.shields.io/badge/forks-see%20GitHub-blue)](https://github.com/internauten/InternautenInfinityScroll/network/members)
 [![Repo Size](https://img.shields.io/github/repo-size/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
 [![Code Size](https://img.shields.io/github/languages/code-size/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
 [![Top Language](https://img.shields.io/github/languages/top/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
