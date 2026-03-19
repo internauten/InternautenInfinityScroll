@@ -21,7 +21,7 @@ class Internauteninfinityscroll extends Module
     {
         $this->name = 'internauteninfinityscroll';
         $this->tab = 'front_office_features';
-        $this->version = '0.1.2';
+        $this->version = '0.1.3';
         $this->author = 'die.internauten.ch';
         $this->need_instance = 0;
         $this->bootstrap = false;
@@ -298,7 +298,10 @@ class Internauteninfinityscroll extends Module
         $helper->module = $this;
         $helper->name_controller = $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
+            . '&configure=' . $this->name
+            . '&tab_module=' . $this->tab
+            . '&module_name=' . $this->name;
         $helper->submit_action = 'submit' . $this->name;
         $helper->default_form_language = (int) Configuration::get('PS_LANG_DEFAULT');
         $helper->allow_employee_form_lang = (int) Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG');
