@@ -4,7 +4,6 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MODULE_FILE_DEFAULT="${ROOT_DIR}/internauteninfinityscroll/internauteninfinityscroll.php"
 MODULE_FILE="${MODULE_FILE_DEFAULT}"
-PUSH_TAGS=false
 ALSO_PLAIN_TAG=false
 DRY_RUN=false
 
@@ -15,14 +14,13 @@ Usage:
 
 Options:
   --module-file <path>   Path to module main PHP file
-  --push                 Push created tag(s) to origin
   --also-plain-tag       Also create tag without v prefix (e.g. 1.2.3)
   --dry-run              Print actions without creating tags
   -h, --help             Show this help
 
 Behavior:
   - Reads $this->version from the module file
-  - Creates an annotated tag: v<version>
+  - Creates an annotated tag: v<version> and pushes it to origin
   - Optional: creates additional plain tag: <version>
 USAGE
 }
@@ -36,9 +34,6 @@ while [[ $# -gt 0 ]]; do
         echo "Error: --module-file requires a path argument." >&2
         exit 1
       fi
-      ;;
-    --push)
-      PUSH_TAGS=true
       ;;
     --also-plain-tag)
       ALSO_PLAIN_TAG=true
@@ -112,13 +107,11 @@ create_tag() {
     echo "Created tag: ${tag}"
   fi
 
-  if [[ "${PUSH_TAGS}" == "true" ]]; then
-    if [[ "${DRY_RUN}" == "true" ]]; then
-      echo "[dry-run] Would push tag to origin: ${tag}"
-    else
-      git -C "${ROOT_DIR}" push origin "${tag}"
-      echo "Pushed tag: ${tag}"
-    fi
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "[dry-run] Would push tag to origin: ${tag}"
+  else
+    git -C "${ROOT_DIR}" push origin "${tag}"
+    echo "Pushed tag: ${tag}"
   fi
 }
 

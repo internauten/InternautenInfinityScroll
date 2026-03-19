@@ -54,7 +54,7 @@ Workflow file: `.github/workflows/tag-release.yml`
 
 Script file: `scripts/create-tags-from-module-version.sh`
 
-The script reads `$this->version` from `internauteninfinityscroll/internauteninfinityscroll.php` and creates an annotated tag like `v0.0.1`.
+The script reads `$this->version` from `internauteninfinityscroll/internauteninfinityscroll.php`, creates an annotated tag like `v0.0.1`, and pushes it to `origin`.
 
 Examples:
 
@@ -62,14 +62,11 @@ Examples:
 # Validate without creating tags
 ./scripts/create-tags-from-module-version.sh --dry-run
 
-# Create local tag v<version>
+# Create and push tag v<version>
 ./scripts/create-tags-from-module-version.sh
 
-# Create and push tag to origin
-./scripts/create-tags-from-module-version.sh --push
-
 # Also create plain tag <version> in addition to v<version>
-./scripts/create-tags-from-module-version.sh --also-plain-tag --push
+./scripts/create-tags-from-module-version.sh --also-plain-tag
 ```
 
 ### Safety checks in script
