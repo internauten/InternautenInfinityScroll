@@ -1,0 +1,51 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+
+# VS Code workspace-local settings (keep shared recommendations out if needed)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Logs
+*.log
+logs/
+
+# Environment and local overrides
+.env
+.env.*
+*.local
+
+# PHP / Composer
+/vendor/
+composer.lock
+.phpunit.result.cache
+
+# Node tooling (if used for assets/build)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build artifacts and archives
+dist/
+build/
+coverage/
+*.zip
+*.tar
+*.tar.gz
+
+# Temporary files
+tmp/
+temp/
+.cache/
