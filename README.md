@@ -12,8 +12,8 @@
 [![Open Issues](https://img.shields.io/github/issues/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/issues)
 [![Open PRs](https://img.shields.io/github/issues-pr/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/pulls)
 
-[![Stars](https://img.shields.io/badge/stars-see%20GitHub-blue)](https://github.com/internauten/InternautenInfinityScroll/stargazers)
-[![Forks](https://img.shields.io/badge/forks-see%20GitHub-blue)](https://github.com/internauten/InternautenInfinityScroll/network/members)
+[![Stars](https://img.shields.io/github/stars/internauten/InternautenInfinityScroll?style=flat)](https://github.com/internauten/InternautenInfinityScroll/stargazers)
+[![Forks](https://img.shields.io/github/forks/internauten/InternautenInfinityScroll?style=flat)](https://github.com/internauten/InternautenInfinityScroll/network/members)
 [![Repo Size](https://img.shields.io/github/repo-size/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
 [![Code Size](https://img.shields.io/github/languages/code-size/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
 [![Top Language](https://img.shields.io/github/languages/top/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
