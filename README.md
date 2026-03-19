@@ -1,5 +1,29 @@
 # internauteninfinityscroll
 
+[![Release Workflow](https://img.shields.io/github/actions/workflow/status/internauten/InternautenInfinityScroll/tag-release.yml?label=release%20workflow)](https://github.com/internauten/InternautenInfinityScroll/actions/workflows/tag-release.yml)
+[![Latest Release](https://img.shields.io/github/v/release/internauten/InternautenInfinityScroll?display_name=tag)](https://github.com/internauten/InternautenInfinityScroll/releases)
+[![Release Date](https://img.shields.io/github/release-date/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/releases)
+[![License](https://img.shields.io/github/license/internauten/InternautenInfinityScroll)](LICENSE)
+[![Tag](https://img.shields.io/github/v/tag/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/tags)
+
+[![Last Commit](https://img.shields.io/github/last-commit/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/commits/main)
+[![Commit Activity](https://img.shields.io/github/commit-activity/m/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/graphs/commit-activity)
+[![Contributors](https://img.shields.io/github/contributors/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/graphs/contributors)
+[![Repo Size](https://img.shields.io/github/repo-size/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
+[![Code Size](https://img.shields.io/github/languages/code-size/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
+
+[![Top Language](https://img.shields.io/github/languages/top/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
+[![Languages Count](https://img.shields.io/github/languages/count/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll)
+[![Open Issues](https://img.shields.io/github/issues/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/issues)
+[![Open PRs](https://img.shields.io/github/issues-pr/internauten/InternautenInfinityScroll)](https://github.com/internauten/InternautenInfinityScroll/pulls)
+[![Stars](https://img.shields.io/github/stars/internauten/InternautenInfinityScroll?style=social)](https://github.com/internauten/InternautenInfinityScroll/stargazers)
+[![Forks](https://img.shields.io/github/forks/internauten/InternautenInfinityScroll?style=social)](https://github.com/internauten/InternautenInfinityScroll/network/members)
+
+[![PrestaShop](https://img.shields.io/badge/PrestaShop-1.7%2B-blue)](https://www.prestashop.com/)
+[![PHP](https://img.shields.io/badge/PHP-7.2%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![Module Type](https://img.shields.io/badge/type-front--office%20module-0A7B83)](https://github.com/internauten/InternautenInfinityScroll)
+[![Maintained](https://img.shields.io/badge/maintained-yes-success)](https://github.com/internauten/InternautenInfinityScroll/commits/main)
+
 PrestaShop module that replaces product listing pagination with infinite scroll.
 
 ## Features
