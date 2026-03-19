@@ -14,12 +14,13 @@ class Internauteninfinityscroll extends Module
     private const CONF_PRODUCT_ITEM_SELECTOR = 'IIS_PRODUCT_ITEM_SELECTOR';
     private const CONF_NEXT_LINK_SELECTORS = 'IIS_NEXT_LINK_SELECTORS';
     private const CONF_PAGINATION_SELECTORS = 'IIS_PAGINATION_SELECTORS';
+    private const CONF_DEBUG_LOGS = 'IIS_DEBUG_LOGS';
 
     public function __construct()
     {
         $this->name = 'internauteninfinityscroll';
         $this->tab = 'front_office_features';
-        $this->version = '0.0.1';
+        $this->version = '0.0.2';
         $this->author = 'die.internauten.ch';
         $this->need_instance = 0;
         $this->bootstrap = false;
@@ -86,6 +87,7 @@ class Internauteninfinityscroll extends Module
                 self::CONF_PAGINATION_SELECTORS,
                 $this->sanitizeSelectorMultiline((string) Tools::getValue(self::CONF_PAGINATION_SELECTORS, ''))
             );
+            Configuration::updateValue(self::CONF_DEBUG_LOGS, (int) Tools::getValue(self::CONF_DEBUG_LOGS, 0));
 
             $output .= $this->displayConfirmation($this->l('Settings updated.'));
         }
@@ -126,6 +128,7 @@ class Internauteninfinityscroll extends Module
                 'paginationSelectors' => $resolved['paginationSelectors'],
                 'loadingText' => $this->l('Loading more products...'),
                 'errorText' => $this->l('Could not load more products.'),
+                'debug' => (bool) Configuration::get(self::CONF_DEBUG_LOGS, false),
             ],
         ]);
     }
@@ -149,7 +152,8 @@ class Internauteninfinityscroll extends Module
             && Configuration::updateValue(
                 self::CONF_PAGINATION_SELECTORS,
                 implode("\n", $generic['paginationSelectors'])
-            );
+            )
+            && Configuration::updateValue(self::CONF_DEBUG_LOGS, 0);
     }
 
     private function uninstallConfiguration()
@@ -159,7 +163,8 @@ class Internauteninfinityscroll extends Module
             && Configuration::deleteByName(self::CONF_PRODUCT_LIST_SELECTORS)
             && Configuration::deleteByName(self::CONF_PRODUCT_ITEM_SELECTOR)
             && Configuration::deleteByName(self::CONF_NEXT_LINK_SELECTORS)
-            && Configuration::deleteByName(self::CONF_PAGINATION_SELECTORS);
+            && Configuration::deleteByName(self::CONF_PAGINATION_SELECTORS)
+            && Configuration::deleteByName(self::CONF_DEBUG_LOGS);
     }
 
     private function renderForm()
@@ -226,6 +231,25 @@ class Internauteninfinityscroll extends Module
                         'rows' => 4,
                         'desc' => $this->l('One CSS selector per line for pagination containers to hide.'),
                     ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Enable debug logs'),
+                        'name' => self::CONF_DEBUG_LOGS,
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => self::CONF_DEBUG_LOGS . '_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => self::CONF_DEBUG_LOGS . '_off',
+                                'value' => 0,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                        'desc' => $this->l('Logs load/stop decisions to the browser console for troubleshooting.'),
+                    ],
                 ],
                 'submit' => [
                     'title' => $this->l('Save'),
@@ -248,6 +272,7 @@ class Internauteninfinityscroll extends Module
             self::CONF_PRODUCT_ITEM_SELECTOR => (string) Configuration::get(self::CONF_PRODUCT_ITEM_SELECTOR, ''),
             self::CONF_NEXT_LINK_SELECTORS => (string) Configuration::get(self::CONF_NEXT_LINK_SELECTORS, ''),
             self::CONF_PAGINATION_SELECTORS => (string) Configuration::get(self::CONF_PAGINATION_SELECTORS, ''),
+            self::CONF_DEBUG_LOGS => (int) Configuration::get(self::CONF_DEBUG_LOGS, 0),
         ];
 
         return $helper->generateForm([$form]);
