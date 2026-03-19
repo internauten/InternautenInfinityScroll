@@ -15,6 +15,7 @@ class Internauteninfinityscroll extends Module
     private const CONF_NEXT_LINK_SELECTORS = 'IIS_NEXT_LINK_SELECTORS';
     private const CONF_PAGINATION_SELECTORS = 'IIS_PAGINATION_SELECTORS';
     private const CONF_DEBUG_LOGS = 'IIS_DEBUG_LOGS';
+    private const CONF_RESPONSE_MODE = 'IIS_RESPONSE_MODE';
 
     public function __construct()
     {
@@ -69,8 +70,15 @@ class Internauteninfinityscroll extends Module
                 $themeProfile = 'auto';
             }
 
+            $responseMode = (string) Tools::getValue(self::CONF_RESPONSE_MODE, 'json');
+            $allowedResponseModes = ['auto', 'json', 'html'];
+            if (!in_array($responseMode, $allowedResponseModes, true)) {
+                $responseMode = 'json';
+            }
+
             Configuration::updateValue(self::CONF_BATCH_SIZE, $batchSize);
             Configuration::updateValue(self::CONF_THEME_PROFILE, $themeProfile);
+            Configuration::updateValue(self::CONF_RESPONSE_MODE, $responseMode);
             Configuration::updateValue(
                 self::CONF_PRODUCT_LIST_SELECTORS,
                 $this->sanitizeSelectorMultiline((string) Tools::getValue(self::CONF_PRODUCT_LIST_SELECTORS, ''))
@@ -129,6 +137,7 @@ class Internauteninfinityscroll extends Module
                 'loadingText' => $this->l('Loading more products...'),
                 'errorText' => $this->l('Could not load more products.'),
                 'debug' => (bool) Configuration::get(self::CONF_DEBUG_LOGS, false),
+                'responseMode' => (string) Configuration::get(self::CONF_RESPONSE_MODE, 'json'),
             ],
         ]);
     }
@@ -140,6 +149,7 @@ class Internauteninfinityscroll extends Module
 
         return Configuration::updateValue(self::CONF_BATCH_SIZE, 20)
             && Configuration::updateValue(self::CONF_THEME_PROFILE, 'auto')
+            && Configuration::updateValue(self::CONF_RESPONSE_MODE, 'json')
             && Configuration::updateValue(
                 self::CONF_PRODUCT_LIST_SELECTORS,
                 implode("\n", $generic['productListSelectors'])
@@ -160,6 +170,7 @@ class Internauteninfinityscroll extends Module
     {
         return Configuration::deleteByName(self::CONF_BATCH_SIZE)
             && Configuration::deleteByName(self::CONF_THEME_PROFILE)
+            && Configuration::deleteByName(self::CONF_RESPONSE_MODE)
             && Configuration::deleteByName(self::CONF_PRODUCT_LIST_SELECTORS)
             && Configuration::deleteByName(self::CONF_PRODUCT_ITEM_SELECTOR)
             && Configuration::deleteByName(self::CONF_NEXT_LINK_SELECTORS)
@@ -176,6 +187,21 @@ class Internauteninfinityscroll extends Module
                 'name' => ucfirst($key),
             ];
         }
+
+        $responseModes = [
+            [
+                'id_option' => 'auto',
+                'name' => $this->l('Auto (prefer JSON, fallback to HTML)'),
+            ],
+            [
+                'id_option' => 'json',
+                'name' => $this->l('JSON only (AJAX endpoint)'),
+            ],
+            [
+                'id_option' => 'html',
+                'name' => $this->l('HTML only (full page response)'),
+            ],
+        ];
 
         $form = [
             'form' => [
@@ -200,6 +226,17 @@ class Internauteninfinityscroll extends Module
                             'name' => 'name',
                         ],
                         'desc' => $this->l('Select AUTO to detect the active theme. Custom selectors below override profile defaults.'),
+                    ],
+                    [
+                        'type' => 'select',
+                        'label' => $this->l('Response mode'),
+                        'name' => self::CONF_RESPONSE_MODE,
+                        'options' => [
+                            'query' => $responseModes,
+                            'id' => 'id_option',
+                            'name' => 'name',
+                        ],
+                        'desc' => $this->l('Choose how next pages are fetched. Use HTML mode if your theme/controller does not return JSON.'),
                     ],
                     [
                         'type' => 'textarea',
@@ -268,6 +305,7 @@ class Internauteninfinityscroll extends Module
         $helper->fields_value = [
             self::CONF_BATCH_SIZE => (int) Configuration::get(self::CONF_BATCH_SIZE, 20),
             self::CONF_THEME_PROFILE => (string) Configuration::get(self::CONF_THEME_PROFILE, 'auto'),
+            self::CONF_RESPONSE_MODE => (string) Configuration::get(self::CONF_RESPONSE_MODE, 'json'),
             self::CONF_PRODUCT_LIST_SELECTORS => (string) Configuration::get(self::CONF_PRODUCT_LIST_SELECTORS, ''),
             self::CONF_PRODUCT_ITEM_SELECTOR => (string) Configuration::get(self::CONF_PRODUCT_ITEM_SELECTOR, ''),
             self::CONF_NEXT_LINK_SELECTORS => (string) Configuration::get(self::CONF_NEXT_LINK_SELECTORS, ''),
@@ -320,7 +358,7 @@ class Internauteninfinityscroll extends Module
         return $clean;
     }
 
-    private function getResolvedSelectors()
+    public function getResolvedSelectors()
     {
         $profiles = $this->getThemeSelectorProfiles();
         $profileKey = (string) Configuration::get(self::CONF_THEME_PROFILE, 'auto');

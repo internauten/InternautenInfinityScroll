@@ -10,6 +10,10 @@
     var loadingText = config.loadingText || 'Loading more products...';
     var errorText = config.errorText || 'Could not load more products.';
     var debugEnabled = Boolean(config.debug);
+    var responseMode = String(config.responseMode || 'json').toLowerCase();
+    if (responseMode !== 'auto' && responseMode !== 'json' && responseMode !== 'html') {
+        responseMode = 'json';
+    }
 
     var state = {
         loading: false,
@@ -34,6 +38,7 @@
         'init-ready': '#198754', // green
         'init-skip': '#fd7e14', // orange
         'load-start': '#0d6efd', // blue
+        'load-source': '#6610f2', // purple
         'load-success': '#198754', // green
         'load-empty': '#ffc107', // yellow
         'load-error': '#dc3545', // red
@@ -99,18 +104,77 @@
         return nextLink.getAttribute('href');
     }
 
-    function withBatchSize(url) {
+    function normalizeListingUrl(url) {
         if (!url) {
             return null;
         }
 
         try {
             var parsed = new URL(url, window.location.href);
+            parsed.searchParams.delete('action');
+            parsed.searchParams.delete('ajax');
+            parsed.searchParams.delete('from-xhr');
+            return parsed;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function withBatchSize(url) {
+        if (!url) {
+            return null;
+        }
+
+        try {
+            var parsed = normalizeListingUrl(url);
+            if (!parsed) {
+                return url;
+            }
             parsed.searchParams.set('n', String(batchSize));
             return parsed.toString();
         } catch (e) {
             return url;
         }
+    }
+
+    function withAjaxHints(url) {
+        if (!url) {
+            return null;
+        }
+
+        try {
+            var parsed = normalizeListingUrl(url);
+            if (!parsed) {
+                return url;
+            }
+            parsed.searchParams.set('action', 'updateProductList');
+            parsed.searchParams.set('ajax', '1');
+            parsed.searchParams.set('from-xhr', '1');
+            return parsed.toString();
+        } catch (e) {
+            return url;
+        }
+    }
+
+    function getRequestPlan(nextUrl) {
+        if (responseMode === 'html') {
+            return {
+                url: withBatchSize(nextUrl),
+                forceType: 'html',
+                headers: {
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                },
+            };
+        }
+
+        return {
+            url: withAjaxHints(nextUrl),
+            forceType: responseMode === 'json' ? 'json' : null,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+            },
+        };
     }
 
     function hidePagination() {
@@ -246,6 +310,43 @@
         }
     }
 
+    function appendProductItems(items) {
+        var addedCount = 0;
+        for (var i = 0; i < items.length; i += 1) {
+            if (!hasSeenProduct(items[i])) {
+                markProductAsSeen(items[i]);
+                state.productContainer.appendChild(items[i]);
+                addedCount += 1;
+            }
+        }
+        return addedCount;
+    }
+
+    function appendProductsFromJson(data) {
+        var parser = new DOMParser();
+        var addedCount = 0;
+        var nextUrl = null;
+
+        var productsHtml = data.rendered_products || '';
+        if (productsHtml) {
+            var productsDoc = parser.parseFromString(productsHtml, 'text/html');
+            var items = productsDoc.querySelectorAll(itemSelector);
+            addedCount = appendProductItems(items);
+        }
+
+        var footerHtml = data.rendered_products_footer || data.rendered_pagination || '';
+        if (footerHtml) {
+            var footerDoc = parser.parseFromString(footerHtml, 'text/html');
+            nextUrl = getNextUrl(footerDoc);
+        }
+
+        return {
+            count: addedCount,
+            nextUrl: nextUrl,
+            source: 'json',
+        };
+    }
+
     function appendProductsFromHtml(html) {
         var parser = new DOMParser();
         var doc = parser.parseFromString(html, 'text/html');
@@ -257,21 +358,13 @@
 
         var items = sourceContainer.querySelectorAll(itemSelector);
         if (!items.length) {
-            return { count: 0, nextUrl: getNextUrl(doc) };
-        }
-
-        var addedCount = 0;
-        for (var i = 0; i < items.length; i += 1) {
-            if (!hasSeenProduct(items[i])) {
-                markProductAsSeen(items[i]);
-                state.productContainer.appendChild(items[i]);
-                addedCount += 1;
-            }
+            return { count: 0, nextUrl: getNextUrl(doc), source: 'html' };
         }
 
         return {
-            count: addedCount,
+            count: appendProductItems(items),
             nextUrl: getNextUrl(doc),
+            source: 'html',
         };
     }
 
@@ -299,28 +392,61 @@
         }
 
         state.loading = true;
+        var requestPlan = getRequestPlan(state.nextUrl);
         debugLog('load-start', {
-            nextUrl: state.nextUrl,
+            nextUrl: requestPlan.url,
             consecutiveEmptyLoads: state.consecutiveEmptyLoads,
+            responseMode: responseMode,
         });
         showLoadingStatusDelayed();
 
-        fetch(withBatchSize(state.nextUrl), {
+        fetch(requestPlan.url, {
             credentials: 'same-origin',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
+            headers: requestPlan.headers,
         })
             .then(function (response) {
                 if (!response.ok) {
                     throw new Error('Request failed with status ' + response.status);
                 }
-                return response.text();
+                var contentType = response.headers.get('content-type') || '';
+                return response.text().then(function (raw) {
+                    var body = raw || '';
+                    var trimmed = body.trim();
+                    var isJsonContentType = contentType.indexOf('application/json') !== -1;
+                    var looksLikeJson = trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[';
+                    var shouldParseJson = isJsonContentType || looksLikeJson;
+
+                    if (shouldParseJson) {
+                        try {
+                            return { type: 'json', data: JSON.parse(trimmed) };
+                        } catch (e) {
+                            debugLog('load-source', {
+                                type: 'json-parse-failed-fallback-html',
+                                responseMode: responseMode,
+                                contentType: contentType,
+                            });
+                        }
+                    }
+
+                    if (requestPlan.forceType === 'json') {
+                        debugLog('load-source', {
+                            type: 'forced-json-but-got-html',
+                            responseMode: responseMode,
+                            contentType: contentType,
+                        });
+                    }
+
+                    return { type: 'html', data: body };
+                });
             })
-            .then(function (html) {
+            .then(function (wrapped) {
                 state.internalDomUpdate = true;
-                var result = appendProductsFromHtml(html);
+                var result = wrapped.type === 'json'
+                    ? appendProductsFromJson(wrapped.data)
+                    : appendProductsFromHtml(wrapped.data);
                 state.internalDomUpdate = false;
+
+                debugLog('load-source', { type: wrapped.type, source: result.source || null });
 
                 if (!result.count) {
                     state.consecutiveEmptyLoads += 1;
