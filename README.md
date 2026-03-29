@@ -95,6 +95,25 @@ Examples:
 - Fails if target tag already exists
 - Fails on non-dry-run if repository has uncommitted changes
 
+## Develope
+
+Dammit die Container bei jedem neuen Modul nicht jedesmal neu erstellt werden müssen, versuchen wir es mit symlinks.
+
+Voraussetzungen: im compose hat es unter volumes einen Eintrag - /home/dmo/internauten:/internauten
+
+Bash ins WSL2 und holen des Repos:
+
+```bash
+cd ~/internauten
+git clone https://github.com/internauten/InternautenInfinityScroll.git
+```
+
+Bash in den Container und dann
+
+```bash
+ln -s /internauten/InternautenInfinityScroll/internauteninfinityscroll /var/www/html/modules/internauteninfinityscroll
+```
+
 ## License
 
 This project is licensed under the MIT License. See details [`LICENSE`](LICENSE).
